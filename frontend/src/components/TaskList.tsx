@@ -1,22 +1,29 @@
 import { useContext } from "react";
 import { AppContext } from "../context/context_api";
-import axios from "axios";
 
 const TaskList = () => {
     const context = useContext(AppContext);
     const tasks = context?.tasks || [];
 
-    const handleTaskStatus = (taskId: string) => () => {
-
-        axios.put(`/api/tasks/${taskId}`, { completed: !tasks.find(task => task.id === taskId)?.completed })
-            .then(response => {
-                console.log('Task status updated', response.data);
-                // refresh tasks 
-                context?.fetchTasks();
-            })
-            .catch(error => {
-                console.error('Error updating task status', error);
-            });
+    const handleTaskStatus = (taskId: string) => async () => {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      try {
+        if (context?.editTask) {
+          await context.editTask(taskId, task.title, task.description, !task.completed);
+        } else {
+          // fallback: call API directly
+          const base = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          await fetch(`${base}/api/tasks/${taskId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('token') },
+            body: JSON.stringify({ completed: !task.completed })
+          });
+          context?.fetchTasks?.();
+        }
+      } catch (error) {
+        console.error('Error updating task status', error);
+      }
     };
 
   return (

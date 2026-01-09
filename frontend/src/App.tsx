@@ -10,7 +10,6 @@ function App() {
     <AppProvider>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </AppProvider>
   );

@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { AppContext } from '../context/context_api';
 import TaskList from '../components/TaskList';
 import Auth from '../components/Auth';
+import AdminPanel from '../components/adminPannel';
 
 
 function LandingPage() {
@@ -11,13 +12,15 @@ function LandingPage() {
     
     return (
         <div>
-            <h4>Welcome, {user?.name} to your tasks dashboard</h4>
-            {user ? ( 
-                <TaskList />
+            {user ? (
+                user.type === 'admin' ? (
+                    <AdminPanel />
+                ) : (
+                    <TaskList />
+                )
             ) : (
                 <>
-                <h2>Please Log in to see your tasks.</h2>
-                <Auth />
+                    <Auth />
                 </>
             )}
         </div>
